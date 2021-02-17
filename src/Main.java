@@ -13,11 +13,16 @@ public class Main {
         String inputFilePath = "input.txt";
         String outputFilePath = "output.txt";
 
-        //Input file
-        File inputFile = new File(inputFilePath);
-
         //Get all dialogues
-        ArrayList<String> dialogueArray = dialogues(inputFile);
+        ArrayList<String> dialogueArray;
+        try {
+            dialogueArray = dialogues(inputFilePath);
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + inputFilePath + " not found.");
+            e.printStackTrace();
+            //Return so that it doesn't try to write to file afterwards
+            return;
+        }
 
         //Write
         try {
@@ -27,39 +32,33 @@ public class Main {
         }
     }
 
-    public static ArrayList<String> dialogues(File inputFile) {
+    public static ArrayList<String> dialogues(String inputFilePath) throws FileNotFoundException {
         //Vars
+        File inputFile = new File(inputFilePath);
         ArrayList<String> dialogueArray = new ArrayList<>();
         //Define our regex pattern
         Pattern pattern = Pattern.compile("\"(.*?)[\"\\n]");
 
-        //File not found exception
-        try {
-            //Scanner variable
-            Scanner scanner = new Scanner(inputFile);
+        //Scanner variable, file not found exception
+        Scanner scanner = new Scanner(inputFile);
 
-            //While there are more lines in the input file
-            while (scanner.hasNextLine()) {
-                //Set string currentLine to scanner's next line
-                String currentLine = scanner.nextLine();
+        //While there are more lines in the input file
+        while (scanner.hasNextLine()) {
+            //Set string currentLine to scanner's next line
+            String currentLine = scanner.nextLine();
 
-                //Match our regex pattern
-                Matcher matcher = pattern.matcher(currentLine);
+            //Match our regex pattern
+            Matcher matcher = pattern.matcher(currentLine);
 
-                //If we have a match
-                while (matcher.find()) {
-                    //Add the current line's regex group one (only the text) to dialogueArray
-                    dialogueArray.add(matcher.group(1));
-                }
+            //If we have a match
+            while (matcher.find()) {
+                //Add the current line's regex group one (only the text) to dialogueArray
+                dialogueArray.add(matcher.group(1));
             }
-
-            //Close scanner
-            scanner.close();
-            //Catch exception
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
-            e.printStackTrace();
         }
+
+        //Close scanner
+        scanner.close();
 
         return dialogueArray;
     }
