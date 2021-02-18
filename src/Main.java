@@ -2,6 +2,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -17,8 +20,7 @@ public class Main {
         ArrayList<String> dialogueArray;
         try {
             dialogueArray = dialogues(inputFilePath);
-        } catch (FileNotFoundException e) {
-            System.out.println("File " + inputFilePath + " not found.");
+        } catch (IOException e) {
             e.printStackTrace();
             //Return so that it doesn't try to write to file afterwards
             return;
@@ -32,33 +34,21 @@ public class Main {
         }
     }
 
-    public static ArrayList<String> dialogues(String inputFilePath) throws FileNotFoundException {
+    public static ArrayList<String> dialogues(String inputFilePath) throws IOException {
         //Vars
-        File inputFile = new File(inputFilePath);
         ArrayList<String> dialogueArray = new ArrayList<>();
+        String script = new String(Files.readAllBytes(Paths.get(inputFilePath)), StandardCharsets.UTF_8);
         //Define our regex pattern
         Pattern pattern = Pattern.compile("\"(.*?)[\"\\n]");
 
-        //Scanner variable, file not found exception
-        Scanner scanner = new Scanner(inputFile);
+        //Match our regex pattern
+        Matcher matcher = pattern.matcher(script);
 
-        //While there are more lines in the input file
-        while (scanner.hasNextLine()) {
-            //Set string currentLine to scanner's next line
-            String currentLine = scanner.nextLine();
-
-            //Match our regex pattern
-            Matcher matcher = pattern.matcher(currentLine);
-
-            //If we have a match
-            while (matcher.find()) {
-                //Add the current line's regex group one (only the text) to dialogueArray
-                dialogueArray.add(matcher.group(1));
-            }
+        //If we have a match
+        while (matcher.find()) {
+            //Add the current line's regex group one (only the text) to dialogueArray
+            dialogueArray.add(matcher.group(1));
         }
-
-        //Close scanner
-        scanner.close();
 
         return dialogueArray;
     }
