@@ -39,7 +39,7 @@ public class Main {
         ArrayList<String> dialogueArray = new ArrayList<>();
         String script = new String(Files.readAllBytes(Paths.get(inputFilePath)), StandardCharsets.UTF_8);
         //Define our regex pattern
-        Pattern pattern = Pattern.compile("\"(.*?)[\"\\n]");
+        Pattern pattern = Pattern.compile("\"(?!\\s)(.*?)(\\n(?=\\n*\")|\")", Pattern.DOTALL);
 
         //Match our regex pattern
         Matcher matcher = pattern.matcher(script);
